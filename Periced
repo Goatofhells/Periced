@@ -1,5 +1,6 @@
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 
 local COLORS = {
 	bg     = Color3.fromRGB(25, 25, 25),
@@ -70,7 +71,7 @@ local function createGui(title, version)
 		BorderSizePixel = 0,
 		BackgroundColor3 = COLORS.bg,
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Size = UDim2.new(0.58232, 0, 0.63021, 0),
+		Size = UDim2.new(0.78, 0, 0.78, 0),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		Name = "MainFrameContainer",
 		Draggable = true,
@@ -82,6 +83,35 @@ local function createGui(title, version)
 		ColorSequenceKeypoint.new(0.505, Color3.fromRGB(79, 79, 79)),
 		ColorSequenceKeypoint.new(1, Color3.fromRGB(79, 79, 79)),
 	})
+
+	local dragging, dragStart, startPos = false, nil, nil
+
+	UserInputService.InputBegan:Connect(function(input, gpe)
+		if gpe then return end
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			local pos = input.Position
+			local ap = main.AbsolutePosition
+			local as = main.AbsoluteSize
+			if pos.X >= ap.X and pos.X <= ap.X + as.X and pos.Y >= ap.Y and pos.Y <= ap.Y + as.Y * 0.18 then
+				dragging = true
+				dragStart = pos
+				startPos = main.Position
+			end
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			local delta = input.Position - dragStart
+			main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		end
+	end)
+
+	UserInputService.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = false
+		end
+	end)
 
 	local shadowFolder = new("Folder", main, { Name = "Shadows" })
 	local shadow = new("Frame", shadowFolder, {
@@ -318,7 +348,7 @@ local function createGui(title, version)
 
 			local function refresh()
 				check.Visible = state
-				box.BackgroundColor3 = state and Color3.fromRGB(50, 50, 80) or Color3.fromRGB(30, 30, 30)
+				box.BackgroundColor3 = state and Color3.fromRGB(80, 60, 200) or Color3.fromRGB(30, 30, 30)
 				if callback then callback(state) end
 			end
 

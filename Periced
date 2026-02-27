@@ -2,13 +2,13 @@ local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 
 local COLORS = {
-	bg = Color3.fromRGB(25, 25, 25),
+	bg     = Color3.fromRGB(25, 25, 25),
 	sidebar = Color3.fromRGB(14, 14, 14),
 	section = Color3.fromRGB(23, 23, 23),
-	toggle = Color3.fromRGB(43, 43, 43),
-	stroke = Color3.fromRGB(48, 48, 48),
-	text = Color3.fromRGB(255, 255, 255),
-	shadow = Color3.fromRGB(59, 59, 59),
+	toggle  = Color3.fromRGB(43, 43, 43),
+	stroke  = Color3.fromRGB(48, 48, 48),
+	text    = Color3.fromRGB(255, 255, 255),
+	shadow  = Color3.fromRGB(59, 59, 59),
 }
 
 local function new(class, parent, props)
@@ -41,7 +41,6 @@ local function makeBubble(parent, size, x, duration)
 		ZIndex = 0,
 	})
 	corner(b, UDim.new(1, 0))
-
 	local function float()
 		if not b.Parent then return end
 		b.Position = UDim2.new(x + math.random(-3, 3) * 0.01, 0, 1.2, 0)
@@ -52,20 +51,12 @@ local function makeBubble(parent, size, x, duration)
 		}):Play()
 		task.delay(duration, float)
 	end
-
 	task.delay(math.random(0, math.floor(duration * 10)) / 10, float)
 end
 
-local G = {}
-G.__index = G
-
-local Tab = {}
-Tab.__index = Tab
-
-function G.new(title, version)
-	local self = setmetatable({}, G)
-	self._tabs = {}
-	self._activeTab = nil
+local function createGui(title, version)
+	local gui = {}
+	local activeTab = nil
 
 	local screen = new("ScreenGui", Players.LocalPlayer:WaitForChild("PlayerGui"), {
 		IgnoreGuiInset = true,
@@ -112,22 +103,18 @@ function G.new(title, version)
 		Name = "TopBar",
 		ClipsDescendants = true,
 	})
-
 	for i = 1, 8 do
 		makeBubble(topBar, math.random(4, 9), math.random(5, 90) / 100, math.random(25, 45) / 10)
 	end
 
 	local titleLabel = new("TextLabel", topBar, {
-		TextWrapped = true,
-		BorderSizePixel = 0,
-		TextScaled = true,
-		BackgroundTransparency = 1,
+		TextWrapped = true, BorderSizePixel = 0, TextScaled = true,
+		BackgroundTransparency = 1, ZIndex = 2,
 		FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
 		TextColor3 = COLORS.text,
 		Size = UDim2.new(1, 0, 0.47619, 0),
 		Text = title or "Perided",
 		Name = "Title",
-		ZIndex = 2,
 	})
 	gradient(titleLabel, 90, ColorSequence.new{
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 248)),
@@ -135,17 +122,14 @@ function G.new(title, version)
 	})
 
 	local versionLabel = new("TextLabel", topBar, {
-		TextWrapped = true,
-		BorderSizePixel = 0,
-		TextScaled = true,
-		BackgroundTransparency = 1,
+		TextWrapped = true, BorderSizePixel = 0, TextScaled = true,
+		BackgroundTransparency = 1, ZIndex = 2,
 		FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
 		TextColor3 = COLORS.text,
 		Size = UDim2.new(0.7, 0, 0.47619, 0),
 		Text = "Version: " .. (version or "?"),
 		Name = "Version",
 		Position = UDim2.new(0, 0, 0.52381, 0),
-		ZIndex = 2,
 	})
 	gradient(versionLabel, 90, ColorSequence.new{
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 32)),
@@ -153,17 +137,13 @@ function G.new(title, version)
 	})
 
 	local tagLabel = new("TextLabel", topBar, {
-		TextWrapped = true,
-		BorderSizePixel = 0,
-		TextScaled = true,
-		BackgroundTransparency = 1,
+		TextWrapped = true, BorderSizePixel = 0, TextScaled = true,
+		BackgroundTransparency = 1, ZIndex = 2,
 		FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
 		TextColor3 = COLORS.text,
 		Size = UDim2.new(0.20472, 0, 0.61765, 0),
-		Text = "Beta",
-		Name = "Tag",
+		Text = "Beta", Name = "Tag",
 		Position = UDim2.new(0.75591, 0, 0.4944, 0),
-		ZIndex = 2,
 	})
 	gradient(tagLabel, 90, ColorSequence.new{
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 232, 6)),
@@ -209,6 +189,7 @@ function G.new(title, version)
 		Position = UDim2.new(0.25854, 0, 0.19008, 0),
 		Name = "SectionArea",
 		BackgroundTransparency = 0.3,
+		BorderSizePixel = 0,
 	})
 	corner(sectionArea)
 	new("UIStroke", sectionArea, { Thickness = 2.4, Color = Color3.fromRGB(120, 120, 120) })
@@ -218,161 +199,154 @@ function G.new(title, version)
 		ColorSequenceKeypoint.new(1, Color3.fromRGB(79, 79, 79)),
 	})
 
-	self._sideScroll = sideScroll
-	self._sectionArea = sectionArea
-
-	return self
-end
-
-function G:AddTab(name, icon)
-	local btn = new("TextButton", self._sideScroll, {
-		TextWrapped = true,
-		BorderSizePixel = 0,
-		TextScaled = true,
-		TextColor3 = COLORS.text,
-		BackgroundColor3 = COLORS.text,
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, 36),
-		Text = icon and ("        " .. name) or ("  " .. name),
-		Name = name,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
-	})
-	corner(btn)
-	gradient(btn, 90, ColorSequence.new{
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(0.177, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(0.879, Color3.fromRGB(65, 65, 65)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(65, 65, 65)),
-	})
-
-	if icon then
-		local img = new("ImageLabel", btn, {
-			BorderSizePixel = 0,
+	function gui:AddTab(name, icon)
+		local btn = new("TextButton", sideScroll, {
+			TextWrapped = true, BorderSizePixel = 0, TextScaled = true,
+			TextColor3 = COLORS.text,
+			BackgroundColor3 = COLORS.text,
 			BackgroundTransparency = 1,
-			Image = "rbxassetid://" .. tostring(icon),
-			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.new(0, 6, 0.5, 0),
-			Size = UDim2.new(0, 22, 0, 22),
-			Name = "Icon",
+			Size = UDim2.new(1, 0, 0, 36),
+			Text = icon and ("        " .. name) or ("  " .. name),
+			Name = name,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
 		})
-		new("UIAspectRatioConstraint", img, { AspectRatio = 1 })
-	end
+		corner(btn)
+		gradient(btn, 90, ColorSequence.new{
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+			ColorSequenceKeypoint.new(0.177, Color3.fromRGB(255, 255, 255)),
+			ColorSequenceKeypoint.new(0.879, Color3.fromRGB(65, 65, 65)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(65, 65, 65)),
+		})
 
-	local section = new("ScrollingFrame", self._sectionArea, {
-		ScrollingDirection = Enum.ScrollingDirection.Y,
-		BorderSizePixel = 0,
-		ElasticBehavior = Enum.ElasticBehavior.Always,
-		BackgroundTransparency = 1,
-		Name = name .. "Section",
-		ScrollBarImageTransparency = 1,
-		AutomaticCanvasSize = Enum.AutomaticSize.Y,
-		CanvasSize = UDim2.new(0, 0, 0, 0),
-		ClipsDescendants = true,
-		Size = UDim2.new(1, 0, 1, 0),
-		Visible = false,
-	})
-	new("UIListLayout", section, { Padding = UDim.new(0, 3) })
-	new("UIPadding", section, {
-		PaddingTop = UDim.new(0, 6),
-		PaddingLeft = UDim.new(0, 6),
-		PaddingRight = UDim.new(0, 6),
-	})
-
-	local tab = setmetatable({ _btn = btn, _section = section }, Tab)
-
-	if not self._activeTab then
-		self._activeTab = tab
-		section.Visible = true
-		btn.BackgroundTransparency = 0.85
-	end
-
-	btn.MouseButton1Click:Connect(function()
-		if self._activeTab then
-			self._activeTab._section.Visible = false
-			self._activeTab._btn.BackgroundTransparency = 1
+		if icon then
+			local img = new("ImageLabel", btn, {
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				Image = "rbxassetid://" .. tostring(icon),
+				AnchorPoint = Vector2.new(0, 0.5),
+				Position = UDim2.new(0, 6, 0.5, 0),
+				Size = UDim2.new(0, 22, 0, 22),
+				Name = "Icon",
+			})
+			new("UIAspectRatioConstraint", img, { AspectRatio = 1 })
 		end
-		self._activeTab = tab
-		section.Visible = true
-		btn.BackgroundTransparency = 0.85
-	end)
 
-	return tab
-end
+		local section = new("ScrollingFrame", sectionArea, {
+			ScrollingDirection = Enum.ScrollingDirection.Y,
+			BorderSizePixel = 0,
+			ElasticBehavior = Enum.ElasticBehavior.Always,
+			BackgroundTransparency = 1,
+			Name = name .. "Section",
+			ScrollBarImageTransparency = 1,
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			CanvasSize = UDim2.new(0, 0, 0, 0),
+			ClipsDescendants = true,
+			Size = UDim2.new(1, 0, 1, 0),
+			Visible = false,
+		})
+		new("UIListLayout", section, { Padding = UDim.new(0, 3) })
+		new("UIPadding", section, {
+			PaddingTop = UDim.new(0, 6),
+			PaddingLeft = UDim.new(0, 6),
+			PaddingRight = UDim.new(0, 6),
+		})
 
-function Tab:AddToggle(label, default, callback)
-	local state = default or false
+		if not activeTab then
+			activeTab = { btn = btn, section = section }
+			section.Visible = true
+			btn.BackgroundTransparency = 0.85
+		end
 
-	local row = new("Frame", self._section, {
-		BorderSizePixel = 0,
-		BackgroundColor3 = COLORS.toggle,
-		Size = UDim2.new(1, 0, 0, 40),
-		Name = label,
-		BackgroundTransparency = 0.3,
-	})
-	corner(row)
+		btn.MouseButton1Click:Connect(function()
+			if activeTab then
+				activeTab.section.Visible = false
+				activeTab.btn.BackgroundTransparency = 1
+			end
+			activeTab = { btn = btn, section = section }
+			section.Visible = true
+			btn.BackgroundTransparency = 0.85
+		end)
 
-	new("TextLabel", row, {
-		TextWrapped = true,
-		BorderSizePixel = 0,
-		TextScaled = true,
-		BackgroundTransparency = 1,
-		FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
-		TextColor3 = COLORS.text,
-		Size = UDim2.new(0.7, 0, 1, 0),
-		Position = UDim2.new(0.03, 0, 0, 0),
-		Text = label,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		Name = "Label",
-	})
+		local tab = {}
 
-	local box = new("Frame", row, {
-		BackgroundColor3 = Color3.fromRGB(30, 30, 30),
-		BorderSizePixel = 0,
-		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(0.97, 0, 0.5, 0),
-		Size = UDim2.new(0, 22, 0, 22),
-		Name = "Checkbox",
-	})
-	corner(box, UDim.new(0, 4))
-	new("UIStroke", box, { Thickness = 1.5, Color = Color3.fromRGB(100, 100, 100) })
+		function tab:AddToggle(label, default, callback)
+			local state = default or false
 
-	local check = new("ImageLabel", box, {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		Image = "rbxassetid://9754130783",
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.new(0.5, 0, 0.5, 0),
-		Size = UDim2.new(0.75, 0, 0.75, 0),
-		Visible = state,
-		Name = "Check",
-	})
+			local row = new("Frame", section, {
+				BorderSizePixel = 0,
+				BackgroundColor3 = COLORS.toggle,
+				Size = UDim2.new(1, 0, 0, 40),
+				Name = label,
+				BackgroundTransparency = 0.3,
+			})
+			corner(row)
 
-	local function refresh()
-		check.Visible = state
-		box.BackgroundColor3 = state and Color3.fromRGB(50, 50, 80) or Color3.fromRGB(30, 30, 30)
-		if callback then callback(state) end
+			new("TextLabel", row, {
+				TextWrapped = true, BorderSizePixel = 0, TextScaled = true,
+				BackgroundTransparency = 1,
+				FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
+				TextColor3 = COLORS.text,
+				Size = UDim2.new(0.7, 0, 1, 0),
+				Position = UDim2.new(0.03, 0, 0, 0),
+				Text = label,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Name = "Label",
+			})
+
+			local box = new("Frame", row, {
+				BackgroundColor3 = Color3.fromRGB(30, 30, 30),
+				BorderSizePixel = 0,
+				AnchorPoint = Vector2.new(1, 0.5),
+				Position = UDim2.new(0.97, 0, 0.5, 0),
+				Size = UDim2.new(0, 22, 0, 22),
+				Name = "Checkbox",
+			})
+			corner(box, UDim.new(0, 4))
+			new("UIStroke", box, { Thickness = 1.5, Color = Color3.fromRGB(100, 100, 100) })
+
+			local check = new("ImageLabel", box, {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				Image = "rbxassetid://9754130783",
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				Size = UDim2.new(0.75, 0, 0.75, 0),
+				Visible = state,
+				Name = "Check",
+			})
+
+			local function refresh()
+				check.Visible = state
+				box.BackgroundColor3 = state and Color3.fromRGB(50, 50, 80) or Color3.fromRGB(30, 30, 30)
+				if callback then callback(state) end
+			end
+
+			refresh()
+
+			local clickBtn = new("TextButton", row, {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				Text = "",
+				Size = UDim2.new(1, 0, 1, 0),
+				Name = "ToggleBtn",
+			})
+
+			clickBtn.MouseButton1Click:Connect(function()
+				state = not state
+				refresh()
+			end)
+
+			return {
+				Set = function(v) state = v refresh() end,
+				Get = function() return state end,
+			}
+		end
+
+		return tab
 	end
 
-	refresh()
-
-	local clickBtn = new("TextButton", row, {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		Text = "",
-		Size = UDim2.new(1, 0, 1, 0),
-		Name = "ToggleBtn",
-	})
-
-	clickBtn.MouseButton1Click:Connect(function()
-		state = not state
-		refresh()
-	end)
-
-	return {
-		Set = function(v) state = v refresh() end,
-		Get = function() return state end,
-	}
+	return gui
 end
 
-return G
+return createGui

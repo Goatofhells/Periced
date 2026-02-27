@@ -31,8 +31,6 @@ local function gradient(parent, rot, seq)
 	g.Parent = parent
 end
 
-None
-
 local function createGui(title, version)
 	local gui = {}
 	local activeTab = nil
@@ -75,17 +73,17 @@ local function createGui(title, version)
 	new("UIStroke", shadow, { Thickness = 2.4, Color = Color3.fromRGB(120, 120, 120) })
 
 	local dragging, dragStart, startPos = false, nil, nil
-	UIS.InputBegan:Connect(function(input, gpe)
+	UIS.InputBegan:Connect(function(input)
 		if input.UserInputType ~= Enum.UserInputType.MouseButton1
 			and input.UserInputType ~= Enum.UserInputType.Touch then return end
 		local ap = main.AbsolutePosition
 		local as = main.AbsoluteSize
-		local p  = input.Position
+		local p = input.Position
 		if p.X >= ap.X and p.X <= ap.X + as.X
 			and p.Y >= ap.Y and p.Y <= ap.Y + as.Y * 0.18 then
-			dragging  = true
+			dragging = true
 			dragStart = p
-			startPos  = main.Position
+			startPos = main.Position
 		end
 	end)
 	UIS.InputChanged:Connect(function(input)
@@ -112,9 +110,6 @@ local function createGui(title, version)
 		Name = "TopBar",
 		ClipsDescendants = true,
 	})
-	for i = 1, 8 do
-		makeBubble(topBar, math.random(4, 9), math.random(5, 90) / 100, math.random(25, 45) / 10)
-	end
 
 	new("ImageLabel", topBar, {
 		BorderSizePixel = 0,
@@ -248,8 +243,7 @@ local function createGui(title, version)
 				BackgroundTransparency = 1,
 				Image = "rbxassetid://" .. tostring(icon),
 				AnchorPoint = Vector2.new(0, 0.5),
-				-- positioned before the UIPadding region
-					Position = UDim2.new(0, -26, 0.5, 0),
+				Position = UDim2.new(0, -26, 0.5, 0),
 				Size = UDim2.new(0, 20, 0, 20),
 				Name = "Icon",
 				ZIndex = 2,
@@ -319,7 +313,7 @@ local function createGui(title, version)
 			})
 
 			local box = new("Frame", row, {
-				BackgroundColor3 = Color3.fromRGB(30, 30, 30),
+				BackgroundColor3 = Color3.fromRGB(180, 30, 30),
 				BorderSizePixel = 0,
 				AnchorPoint = Vector2.new(1, 0.5),
 				Position = UDim2.new(0.97, 0, 0.5, 0),

@@ -1,1 +1,391 @@
-loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/644756765d3e5e77b3a9b4adc99a2b13a5747fd4cbd78aedad4ae8d99eed0a3c/download"))()
+local Perided = {}
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+
+local COLORS = {
+	bg = Color3.fromRGB(25, 25, 25),
+	sidebar = Color3.fromRGB(14, 14, 14),
+	section = Color3.fromRGB(23, 23, 23),
+	toggle = Color3.fromRGB(43, 43, 43),
+	stroke = Color3.fromRGB(48, 48, 48),
+	text = Color3.fromRGB(255, 255, 255),
+	shadow = Color3.fromRGB(59, 59, 59),
+}
+
+local function makeBubble(parent, size, x, y, duration)
+	local b = Instance.new("Frame", parent)
+	b.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	b.BackgroundTransparency = math.random(75, 90) / 100
+	b.BorderSizePixel = 0
+	b.Size = UDim2.new(0, size, 0, size)
+	b.Position = UDim2.new(x, 0, 1.2, 0)
+	b.ZIndex = 0
+	Instance.new("UICorner", b).CornerRadius = UDim.new(1, 0)
+
+	local function float()
+		b.Position = UDim2.new(x + math.random(-3, 3) * 0.01, 0, 1.2, 0)
+		b.BackgroundTransparency = math.random(75, 90) / 100
+		TweenService:Create(b, TweenInfo.new(duration, Enum.EasingStyle.Sine), {
+			Position = UDim2.new(x + math.random(-3, 3) * 0.01, 0, -0.3, 0),
+			BackgroundTransparency = 1,
+		}):Play()
+		task.delay(duration, float)
+	end
+
+	task.delay(math.random(0, math.floor(duration * 10)) / 10, float)
+	return b
+end
+
+local function new(class, parent, props)
+	local i = Instance.new(class, parent)
+	for k, v in pairs(props) do i[k] = v end
+	return i
+end
+
+function Perided.new(title, version)
+	local G = {}
+	local tabs = {}
+	local activeTab = nil
+
+	local screen = new("ScreenGui", Players.LocalPlayer:WaitForChild("PlayerGui"), {
+		IgnoreGuiInset = true,
+		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
+		Name = "Perided",
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+	})
+
+None
+
+	local main = new("Frame", screen, {
+		Active = true,
+		BorderSizePixel = 0,
+		BackgroundColor3 = COLORS.bg,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Size = UDim2.new(0.58232, 0, 0.63021, 0),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Name = "MainFrameContainer",
+	})
+	new("UICorner", main, {})
+	new("UIAspectRatioConstraint", main, { AspectRatio = 1.69421 })
+
+	local shadows = new("Folder", main, { Name = "Shadows" })
+	local shadow = new("Frame", shadows, {
+		ZIndex = -2,
+		BorderSizePixel = 0,
+		BackgroundColor3 = COLORS.shadow,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Size = UDim2.new(1, 8, 1, 8),
+		Position = UDim2.new(0.5, 0, 0.5, 6),
+		Name = "Shadow1",
+		BackgroundTransparency = 0.7,
+	})
+	new("UIStroke", shadow, { Thickness = 2.4, Color = Color3.fromRGB(120, 120, 120) })
+	new("UIGradient", main, {
+		Rotation = -90,
+		Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 30)),
+			ColorSequenceKeypoint.new(0.505, Color3.fromRGB(79, 79, 79)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(79, 79, 79)),
+		},
+	})
+
+	main.Draggable = true
+
+	-- Topbar
+	local topBar = new("Frame", main, {
+		BorderSizePixel = 0,
+		BackgroundColor3 = COLORS.text,
+		Size = UDim2.new(0.30976, 0, 0.1405, 0),
+		Name = "TopBar",
+		BackgroundTransparency = 1,
+		ClipsDescendants = true,
+	})
+
+	-- Bubbles
+	for i = 1, 8 do
+		makeBubble(topBar, math.random(4, 9), math.random(5, 90) / 100, 0, math.random(25, 45) / 10)
+	end
+
+	local titleLabel = new("TextLabel", topBar, {
+		TextWrapped = true,
+		BorderSizePixel = 0,
+		TextScaled = true,
+		BackgroundColor3 = COLORS.text,
+		FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
+		TextColor3 = COLORS.text,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0.47619, 0),
+		Text = title or "Perided",
+		Name = "Title",
+		ZIndex = 2,
+	})
+	new("UIGradient", titleLabel, {
+		Rotation = 90,
+		Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 248)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(132, 57, 255)),
+		},
+	})
+
+	local versionLabel = new("TextLabel", topBar, {
+		TextWrapped = true,
+		BorderSizePixel = 0,
+		TextScaled = true,
+		BackgroundColor3 = COLORS.text,
+		FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
+		TextColor3 = COLORS.text,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0.7, 0, 0.47619, 0),
+		Text = "Version: " .. (version or "?"),
+		Name = "Version",
+		Position = UDim2.new(0, 0, 0.52381, 0),
+		ZIndex = 2,
+	})
+	new("UIGradient", versionLabel, {
+		Rotation = 90,
+		Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 32)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 214, 208)),
+		},
+	})
+
+	local tagLabel = new("TextLabel", topBar, {
+		TextWrapped = true,
+		BorderSizePixel = 0,
+		TextScaled = true,
+		BackgroundColor3 = COLORS.text,
+		FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
+		TextColor3 = COLORS.text,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0.20472, 0, 0.61765, 0),
+		Text = "Beta",
+		Name = "Tag",
+		Position = UDim2.new(0.75591, 0, 0.4944, 0),
+		ZIndex = 2,
+	})
+	new("UIGradient", tagLabel, {
+		Rotation = 90,
+		Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 232, 6)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(162, 130, 7)),
+		},
+	})
+
+	new("Frame", main, {
+		BorderSizePixel = 0,
+		BackgroundColor3 = Color3.fromRGB(58, 58, 58),
+		Size = UDim2.new(0.96341, 0, 0.00413, 0),
+		Position = UDim2.new(0.01951, 0, 0.15289, 0),
+		Name = "Line",
+	})
+
+	-- Sidebar
+	local sidebar = new("Frame", main, {
+		BorderSizePixel = 0,
+		BackgroundColor3 = COLORS.sidebar,
+		ClipsDescendants = true,
+		Size = UDim2.new(0.20976, 0, 0.78926, 0),
+		Position = UDim2.new(0.02195, 0, 0.19421, 0),
+		Name = "SideBar",
+	})
+	new("UICorner", sidebar, {})
+	new("UIStroke", sidebar, { Thickness = 2.5, Color = COLORS.stroke })
+
+	local sideScroll = new("ScrollingFrame", sidebar, {
+		ScrollingDirection = Enum.ScrollingDirection.Y,
+		BorderSizePixel = 0,
+		ElasticBehavior = Enum.ElasticBehavior.Always,
+		BackgroundColor3 = COLORS.text,
+		Name = "SideBarAltFram",
+		ScrollBarImageTransparency = 1,
+		ClipsDescendants = true,
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
+		AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		CanvasSize = UDim2.new(0, 0, 0, 0),
+	})
+	local sideLayout = new("UIListLayout", sideScroll, { Padding = UDim.new(0, 3) })
+
+	-- Section area
+	local sectionArea = new("Frame", main, {
+		BackgroundColor3 = COLORS.section,
+		Size = UDim2.new(0.71707, 0, 0.77273, 0),
+		Position = UDim2.new(0.25854, 0, 0.19008, 0),
+		Name = "SectionArea",
+		BackgroundTransparency = 0.3,
+	})
+	new("UICorner", sectionArea, {})
+	new("UIStroke", sectionArea, { Thickness = 2.4, Color = Color3.fromRGB(120, 120, 120) })
+	new("UIGradient", sectionArea, {
+		Rotation = -90,
+		Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 30)),
+			ColorSequenceKeypoint.new(0.505, Color3.fromRGB(79, 79, 79)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(79, 79, 79)),
+		},
+	})
+
+	local function setActiveTab(tab)
+		if activeTab then
+			activeTab.section.Visible = false
+			activeTab.btn.BackgroundTransparency = 1
+		end
+		activeTab = tab
+		tab.section.Visible = true
+		tab.btn.BackgroundTransparency = 0.85
+	end
+
+	function G:AddTab(name, icon)
+		local btn = new("TextButton", sideScroll, {
+			TextWrapped = true,
+			BorderSizePixel = 0,
+			TextScaled = true,
+			TextColor3 = COLORS.text,
+			BackgroundColor3 = COLORS.text,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 36),
+			Text = "  " .. name,
+			Name = name,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
+		})
+		new("UICorner", btn, {})
+		new("UIGradient", btn, {
+			Rotation = 90,
+			Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.177, Color3.fromRGB(255, 255, 255)),
+				ColorSequenceKeypoint.new(0.879, Color3.fromRGB(65, 65, 65)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(65, 65, 65)),
+			},
+		})
+
+		if icon then
+			local img = new("ImageLabel", btn, {
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				Image = "rbxassetid://" .. tostring(icon),
+				AnchorPoint = Vector2.new(0, 0.5),
+				Position = UDim2.new(0, 6, 0.5, 0),
+				Size = UDim2.new(0, 22, 0, 22),
+				Name = "Icon",
+			})
+			new("UIAspectRatioConstraint", img, { AspectRatio = 1 })
+			btn.Text = "        " .. name
+		end
+
+		local section = new("ScrollingFrame", sectionArea, {
+			ScrollingDirection = Enum.ScrollingDirection.Y,
+			BorderSizePixel = 0,
+			ElasticBehavior = Enum.ElasticBehavior.Always,
+			BackgroundTransparency = 1,
+			Name = name .. "Section",
+			ScrollBarImageTransparency = 1,
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			CanvasSize = UDim2.new(0, 0, 0, 0),
+			ClipsDescendants = true,
+			Size = UDim2.new(1, 0, 1, 0),
+			Visible = false,
+		})
+		new("UIListLayout", section, { Padding = UDim.new(0, 3) })
+		new("UIPadding", section, {
+			PaddingTop = UDim.new(0, 6),
+			PaddingLeft = UDim.new(0, 6),
+			PaddingRight = UDim.new(0, 6),
+		})
+
+		local tab = { btn = btn, section = section, elements = {} }
+		tabs[name] = tab
+
+		btn.MouseButton1Click:Connect(function()
+			setActiveTab(tab)
+		end)
+
+		if not activeTab then
+			setActiveTab(tab)
+		end
+
+		local T = {}
+
+		function T:AddToggle(label, default, callback)
+			local state = default or false
+
+			local row = new("Frame", section, {
+				BorderSizePixel = 0,
+				BackgroundColor3 = COLORS.toggle,
+				Size = UDim2.new(1, 0, 0, 40),
+				Name = label,
+				BackgroundTransparency = 0.3,
+			})
+			new("UICorner", row, {})
+
+			new("TextLabel", row, {
+				TextWrapped = true,
+				BorderSizePixel = 0,
+				TextScaled = true,
+				BackgroundTransparency = 1,
+				FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
+				TextColor3 = COLORS.text,
+				Size = UDim2.new(0.7, 0, 1, 0),
+				Position = UDim2.new(0.03, 0, 0, 0),
+				Text = label,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Name = "Label",
+			})
+
+			local box = new("Frame", row, {
+				BackgroundColor3 = Color3.fromRGB(30, 30, 30),
+				BorderSizePixel = 0,
+				AnchorPoint = Vector2.new(1, 0.5),
+				Position = UDim2.new(0.97, 0, 0.5, 0),
+				Size = UDim2.new(0, 22, 0, 22),
+				Name = "Checkbox",
+			})
+			new("UICorner", box, { CornerRadius = UDim.new(0, 4) })
+			new("UIStroke", box, { Thickness = 1.5, Color = Color3.fromRGB(100, 100, 100) })
+
+			local check = new("ImageLabel", box, {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				Image = "rbxassetid://9754130783",
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				Size = UDim2.new(0.75, 0, 0.75, 0),
+				Visible = state,
+				Name = "Check",
+			})
+
+			local function refresh()
+				check.Visible = state
+				box.BackgroundColor3 = state and Color3.fromRGB(50, 50, 80) or Color3.fromRGB(30, 30, 30)
+				if callback then callback(state) end
+			end
+
+			refresh()
+
+			local btn = new("TextButton", row, {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				Text = "",
+				Size = UDim2.new(1, 0, 1, 0),
+				Name = "ToggleBtn",
+			})
+
+			btn.MouseButton1Click:Connect(function()
+				state = not state
+				refresh()
+			end)
+
+			return {
+				Set = function(_, v) state = v; refresh() end,
+				Get = function(_) return state end,
+			}
+		end
+
+		return T
+	end
+
+	return G, screen
+end
+
+return Perided

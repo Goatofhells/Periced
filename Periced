@@ -89,8 +89,8 @@ local function createGui(title, version)
 		BorderSizePixel = 0,
 		BackgroundColor3 = COLORS.shadow,
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Size = UDim2.new(1, 10, 1, 10),
-		Position = UDim2.new(0.5, 0, 0.5, 6),
+		Size = UDim2.new(1, 0, 1, 0),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
 		Name = "Shadow1",
 		BackgroundTransparency = 0.7,
 	})
@@ -312,7 +312,6 @@ local function createGui(title, version)
 				Size = UDim2.new(1, 0, 0, 40),
 				Name = label,
 				BackgroundTransparency = 0.3,
-	
 			})
 			corner(row)
 
@@ -356,7 +355,7 @@ local function createGui(title, version)
 				check.Visible = state
 				box.BackgroundColor3 = state
 					and Color3.fromRGB(80, 60, 200)
-					or  Color3.fromRGB(30, 30, 30)
+					or Color3.fromRGB(30, 30, 30)
 				if callback then callback(state) end
 			end
 
@@ -371,14 +370,13 @@ local function createGui(title, version)
 				Name = "ToggleBtn",
 			})
 
-			UIS.InputBegan:Connect(function(input)
-				if input.UserInputType ~= Enum.UserInputType.MouseButton1
-					and input.UserInputType ~= Enum.UserInputType.Touch then return end
-				local ap = row.AbsolutePosition
-				local as = row.AbsoluteSize
-				local p = input.Position
-				if p.X >= ap.X and p.X <= ap.X + as.X
-					and p.Y >= ap.Y and p.Y <= ap.Y + as.Y then
+			clickBtn.MouseButton1Click:Connect(function()
+				state = not state
+				refresh()
+			end)
+
+			clickBtn.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.Touch then
 					state = not state
 					refresh()
 				end

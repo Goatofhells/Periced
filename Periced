@@ -236,12 +236,15 @@ local function createGui(title, version)
 			BackgroundColor3 = COLORS.text,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 0, 36),
-			Text = icon and ("        " .. name) or ("  " .. name),
+			Text = name,
 			Name = name,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
 		})
 		corner(btn)
+		new("UIPadding", btn, {
+			PaddingLeft = icon and UDim.new(0, 34) or UDim.new(0, 8),
+		})
 		gradient(btn, 90, ColorSequence.new{
 			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
 			ColorSequenceKeypoint.new(0.177, Color3.fromRGB(255, 255, 255)),
@@ -256,8 +259,9 @@ local function createGui(title, version)
 				Image = "rbxassetid://" .. tostring(icon),
 				AnchorPoint = Vector2.new(0, 0.5),
 				Position = UDim2.new(0, 6, 0.5, 0),
-				Size = UDim2.new(0, 22, 0, 22),
+				Size = UDim2.new(0, 20, 0, 20),
 				Name = "Icon",
+				ZIndex = 2,
 			})
 			new("UIAspectRatioConstraint", img, { AspectRatio = 1 })
 		end

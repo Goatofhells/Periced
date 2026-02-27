@@ -371,9 +371,17 @@ local function createGui(title, version)
 				Name = "ToggleBtn",
 			})
 
-			clickBtn.MouseButton1Click:Connect(function()
-				state = not state
-				refresh()
+			UIS.InputBegan:Connect(function(input)
+				if input.UserInputType ~= Enum.UserInputType.MouseButton1
+					and input.UserInputType ~= Enum.UserInputType.Touch then return end
+				local ap = row.AbsolutePosition
+				local as = row.AbsoluteSize
+				local p = input.Position
+				if p.X >= ap.X and p.X <= ap.X + as.X
+					and p.Y >= ap.Y and p.Y <= ap.Y + as.Y then
+					state = not state
+					refresh()
+				end
 			end)
 
 			return {

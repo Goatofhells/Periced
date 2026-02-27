@@ -1,9 +1,9 @@
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
+local UIS = game:GetService("UserInputService")
 
 local COLORS = {
-	bg     = Color3.fromRGB(25, 25, 25),
+	bg      = Color3.fromRGB(25, 25, 25),
 	sidebar = Color3.fromRGB(14, 14, 14),
 	section = Color3.fromRGB(23, 23, 23),
 	toggle  = Color3.fromRGB(43, 43, 43),
@@ -74,7 +74,6 @@ local function createGui(title, version)
 		Size = UDim2.new(0.78, 0, 0.78, 0),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		Name = "MainFrameContainer",
-		Draggable = true,
 	})
 	corner(main)
 	new("UIAspectRatioConstraint", main, { AspectRatio = 1.69421 })
@@ -84,47 +83,49 @@ local function createGui(title, version)
 		ColorSequenceKeypoint.new(1, Color3.fromRGB(79, 79, 79)),
 	})
 
-	local dragging, dragStart, startPos = false, nil, nil
-
-	UserInputService.InputBegan:Connect(function(input, gpe)
-		if gpe then return end
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			local pos = input.Position
-			local ap = main.AbsolutePosition
-			local as = main.AbsoluteSize
-			if pos.X >= ap.X and pos.X <= ap.X + as.X and pos.Y >= ap.Y and pos.Y <= ap.Y + as.Y * 0.18 then
-				dragging = true
-				dragStart = pos
-				startPos = main.Position
-			end
-		end
-	end)
-
-	UserInputService.InputChanged:Connect(function(input)
-		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-			local delta = input.Position - dragStart
-			main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-		end
-	end)
-
-	UserInputService.InputEnded:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			dragging = false
-		end
-	end)
-
 	local shadowFolder = new("Folder", main, { Name = "Shadows" })
 	local shadow = new("Frame", shadowFolder, {
 		ZIndex = -2,
 		BorderSizePixel = 0,
 		BackgroundColor3 = COLORS.shadow,
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Size = UDim2.new(1, 8, 1, 8),
+		Size = UDim2.new(1, 10, 1, 10),
 		Position = UDim2.new(0.5, 0, 0.5, 6),
 		Name = "Shadow1",
 		BackgroundTransparency = 0.7,
 	})
 	new("UIStroke", shadow, { Thickness = 2.4, Color = Color3.fromRGB(120, 120, 120) })
+
+	local dragging, dragStart, startPos = false, nil, nil
+	UIS.InputBegan:Connect(function(input, gpe)
+		if input.UserInputType ~= Enum.UserInputType.MouseButton1
+			and input.UserInputType ~= Enum.UserInputType.Touch then return end
+		local ap = main.AbsolutePosition
+		local as = main.AbsoluteSize
+		local p  = input.Position
+		if p.X >= ap.X and p.X <= ap.X + as.X
+			and p.Y >= ap.Y and p.Y <= ap.Y + as.Y * 0.18 then
+			dragging  = true
+			dragStart = p
+			startPos  = main.Position
+		end
+	end)
+	UIS.InputChanged:Connect(function(input)
+		if not dragging then return end
+		if input.UserInputType ~= Enum.UserInputType.MouseMovement
+			and input.UserInputType ~= Enum.UserInputType.Touch then return end
+		local d = input.Position - dragStart
+		main.Position = UDim2.new(
+			startPos.X.Scale, startPos.X.Offset + d.X,
+			startPos.Y.Scale, startPos.Y.Offset + d.Y
+		)
+	end)
+	UIS.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1
+			or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = false
+		end
+	end)
 
 	local topBar = new("Frame", main, {
 		BorderSizePixel = 0,
@@ -143,8 +144,7 @@ local function createGui(title, version)
 		FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
 		TextColor3 = COLORS.text,
 		Size = UDim2.new(1, 0, 0.47619, 0),
-		Text = title or "Perided",
-		Name = "Title",
+		Text = title or "Perided", Name = "Title",
 	})
 	gradient(titleLabel, 90, ColorSequence.new{
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 248)),
@@ -157,8 +157,7 @@ local function createGui(title, version)
 		FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
 		TextColor3 = COLORS.text,
 		Size = UDim2.new(0.7, 0, 0.47619, 0),
-		Text = "Version: " .. (version or "?"),
-		Name = "Version",
+		Text = "Version: " .. (version or "?"), Name = "Version",
 		Position = UDim2.new(0, 0, 0.52381, 0),
 	})
 	gradient(versionLabel, 90, ColorSequence.new{
@@ -243,7 +242,7 @@ local function createGui(title, version)
 		})
 		corner(btn)
 		new("UIPadding", btn, {
-			PaddingLeft = icon and UDim.new(0, 34) or UDim.new(0, 8),
+			PaddingLeft = icon and UDim.new(0, 32) or UDim.new(0, 8),
 		})
 		gradient(btn, 90, ColorSequence.new{
 			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
@@ -253,17 +252,17 @@ local function createGui(title, version)
 		})
 
 		if icon then
-			local img = new("ImageLabel", btn, {
+			new("ImageLabel", btn, {
 				BorderSizePixel = 0,
 				BackgroundTransparency = 1,
 				Image = "rbxassetid://" .. tostring(icon),
 				AnchorPoint = Vector2.new(0, 0.5),
-				Position = UDim2.new(0, 6, 0.5, 0),
+				-- positioned before the UIPadding region
+					Position = UDim2.new(0, -26, 0.5, 0),
 				Size = UDim2.new(0, 20, 0, 20),
 				Name = "Icon",
 				ZIndex = 2,
 			})
-			new("UIAspectRatioConstraint", img, { AspectRatio = 1 })
 		end
 
 		local section = new("ScrollingFrame", sectionArea, {
@@ -313,15 +312,16 @@ local function createGui(title, version)
 				Size = UDim2.new(1, 0, 0, 40),
 				Name = label,
 				BackgroundTransparency = 0.3,
+	
 			})
 			corner(row)
 
 			new("TextLabel", row, {
 				TextWrapped = true, BorderSizePixel = 0, TextScaled = true,
-				BackgroundTransparency = 1,
+				BackgroundTransparency = 1, ZIndex = 2,
 				FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json"),
 				TextColor3 = COLORS.text,
-				Size = UDim2.new(0.7, 0, 1, 0),
+				Size = UDim2.new(0.75, 0, 1, 0),
 				Position = UDim2.new(0.03, 0, 0, 0),
 				Text = label,
 				TextXAlignment = Enum.TextXAlignment.Left,
@@ -335,6 +335,7 @@ local function createGui(title, version)
 				Position = UDim2.new(0.97, 0, 0.5, 0),
 				Size = UDim2.new(0, 22, 0, 22),
 				Name = "Checkbox",
+				ZIndex = 2,
 			})
 			corner(box, UDim.new(0, 4))
 			new("UIStroke", box, { Thickness = 1.5, Color = Color3.fromRGB(100, 100, 100) })
@@ -348,11 +349,14 @@ local function createGui(title, version)
 				Size = UDim2.new(0.75, 0, 0.75, 0),
 				Visible = state,
 				Name = "Check",
+				ZIndex = 3,
 			})
 
 			local function refresh()
 				check.Visible = state
-				box.BackgroundColor3 = state and Color3.fromRGB(80, 60, 200) or Color3.fromRGB(30, 30, 30)
+				box.BackgroundColor3 = state
+					and Color3.fromRGB(80, 60, 200)
+					or  Color3.fromRGB(30, 30, 30)
 				if callback then callback(state) end
 			end
 
@@ -363,6 +367,7 @@ local function createGui(title, version)
 				BorderSizePixel = 0,
 				Text = "",
 				Size = UDim2.new(1, 0, 1, 0),
+				ZIndex = 10,
 				Name = "ToggleBtn",
 			})
 

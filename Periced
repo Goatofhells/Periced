@@ -374,3 +374,5 @@ function Tab:AddToggle(label, default, callback)
 		Get = function() return state end,
 	}
 end
+
+return G
